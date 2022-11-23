@@ -238,13 +238,20 @@ type Otto struct {
 	// See "Halting Problem" for more information.
 	Interrupt chan func()
 	runtime   *_runtime
+	console   Console
 }
 
 // New will allocate a new JavaScript runtime
-func New() *Otto {
+func New(options ...Option) *Otto {
 	self := &Otto{
 		runtime: newContext(),
+		console: &console{},
 	}
+
+	for _, o := range options {
+		o(self)
+	}
+
 	self.runtime.otto = self
 	self.runtime.traceLimit = 10
 	self.Set("console", self.runtime.newConsole())
